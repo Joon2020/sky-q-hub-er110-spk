@@ -1,0 +1,12 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H
+
+#define CONFIG_RELOC_FIXUP_WORKS
+#define DECLARE_GLOBAL_DATA_PTR
+
+#define CONFIG_SYS_MAX_NAND_DEVICE	1
+#define CONFIG_SYS_NAND_BASE 		0xb90a5000
+
+#define CONFIG_LILAC
+
+#endif

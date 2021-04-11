@@ -1,0 +1,26 @@
+# A template defconfig file for SKY specific HEADERS: add default SKY specific headers here
+# CONFIG_SKY_VDSL is not set
+# CONFIG_FLASH_CHIP_SIZE is not set
+# CONFIG_SKY_MODEL_SR101 is not set
+# CONFIG_SKY_MODEL_SR102 is not set
+# CONFIG_SKY_MODEL_ER110 is not set
+# CONFIG_SKY_MODEL_EE120 is not set
+# CONFIG_SKY_MODEL_NR701 is not set
+# CONFIG_SKY_IPV6 is not set
+# CONFIG_SKY_ETHAN is not set
+# CONFIG_SKY_I2C_SOFT is not set
+# CONFIG_SKY_NT3H1201 is not set
+# CONFIG_SKY_MESH_SUPPORT is not set
+# CONFIG_WIRELESS is not set
+# CONFIG_WIRELESS_EXT is not set
+# CONFIG_WEXT_CORE is not set
+# CONFIG_WEXT_PROC is not set
+# CONFIG_WEXT_SPY is not set
+# CONFIG_WEXT_PRIV is not set
+# CONFIG_CFG80211 is not set
+# CONFIG_WIRELESS_EXT_SYSFS is not set
+# CONFIG_LIB80211 is not set
+# CONFIG_SKY_FEATURE_WATCHDOG is not set
+# CONFIG_SKY_FEATURE_TIMEDOCTOR is not set
+# CONFIG_SKY_DEFAULT_CONSOLE_UART is not set
+# CONFIG_SKY_REBOOT_DIAGNOSTICS is not set

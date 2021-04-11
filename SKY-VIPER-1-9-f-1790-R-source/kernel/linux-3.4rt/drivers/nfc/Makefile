@@ -1,0 +1,14 @@
+#
+# Makefile for nfc devices
+#
+
+EXTRA_CFLAGS += -I. -I$(INC_BRCMDRIVER_PUB_PATH)/$(BRCM_BOARD) -I$(INC_BRCMSHARED_PUB_PATH)/$(BRCM_BOARD) -I$(INC_BRCMSHARED_PUB_PATH)/$(BRCM_BOARD)
+
+obj-$(CONFIG_PN544_NFC)		+= pn544.o
+obj-$(CONFIG_NFC_PN533)		+= pn533.o
+obj-$(CONFIG_NFC_WILINK)	+= nfcwilink.o
+
+obj-$(CONFIG_SKY_I2C_SOFT) += sky_i2c_soft.o
+obj-$(CONFIG_SKY_NT3H1201) += nt3h1201.o
+
+ccflags-$(CONFIG_NFC_DEBUG) := -DDEBUG

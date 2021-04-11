@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my $cferom;
+my $blocksize;
+my $rootfs;
+my $bootfs;
+my $image;
+my $verbose;
+my $flashtype;
+my $fsonly;
+my $ubifs;
+
+GetOptions(
+    "cferom=s", \$cferom, "blocksize=i", \$blocksize, "rootfs=s", \$rootfs,  "bootfs=s", \$bootfs,
+    "fsonly=s", \$fsonly, "image=s",     \$image,     "verbose",  \$verbose, "ubifs",    \$ubifs
+) or die("bad option");
+
+my @required_env = (
+    qw[
+      PROFILE_DIR HOSTTOOLS_DIR BRCM_VOICE_BOARD_ID BRCM_NUM_MAC_ADDRESSES BRCM_BOARD_ID
+      ]
+);
+
+foreach (@required_env) {
+    $ENV{$_}
+      or die("$_ not defined in environment");
+}
+
+if ( $blocksize == 16 * 1024 ) {
+    $flashtype = "NAND16";
+}
+elsif ( $blocksize == 128 * 1024 ) {
+    $flashtype = "NAND128";
+}
+else {
+    die("blocksize not supported");
+}
+chdir $ENV{PROFILE_DIR};
+e("dd if=/dev/zero of=file128k.tmp bs=1k count=128 > file128k.tmp");
+
+if ($ubifs) {
+    e("$ENV{HOSTTOOLS_DIR}/BcmFsTag -s 2 -u $blocksize > marker.tmp");
+    e("cat $cferom file128k.tmp | head --bytes=$blocksize | cat - $bootfs marker.tmp $rootfs > $image");
+    if ($fsonly) {
+        e("cat $bootfs marker.tmp $rootfs > merged.tmp");
+    }
+    e("rm marker.tmp");
+}
+else {
+    e("cat $cferom file128k.tmp | head --bytes=$blocksize | cat - $rootfs > $image");
+}
+
+if ($fsonly) {
+    if ($ubifs) {
+        e("$ENV{HOSTTOOLS_DIR}/addvtoken --chip $ENV{BRCM_CHIP} --flashtype $flashtype merged.tmp $fsonly.w");
+        e("rm -f merged.tmp");
+    }
+    else {
+        e("$ENV{HOSTTOOLS_DIR}/addvtoken --chip $ENV{BRCM_CHIP} --flashtype $flashtype $rootfs $fsonly.w");
+    }
+}
+e("$ENV{HOSTTOOLS_DIR}/addvtoken --chip $ENV{BRCM_CHIP} --flashtype $flashtype $image $image.w");
+e(      "$ENV{HOSTTOOLS_DIR}/createimg --boardid=$ENV{BRCM_BOARD_ID} "
+      . " --voiceboardid $ENV{BRCM_VOICE_BOARD_ID}"
+      . " --numbermac=$ENV{BRCM_NUM_MAC_ADDRESSES}"
+      . " --macaddr=$ENV{BRCM_BASE_MAC_ADDRESS}"
+      . " --tp=$ENV{BRCM_MAIN_TP_NUM}"
+      . " --psisize=$ENV{BRCM_PSI_SIZE}"
+      . " --auxfsprcnt=$ENV{BRCM_AUXFS_PERCENT}"
+      . " --gponsn=$ENV{BRCM_GPON_SERIAL_NUMBER}"
+      . " --gponpw=$ENV{BRCM_GPON_PASSWORD}"
+      . " --wholeflashfile=$image.w" );
+e("rm $image file128k.tmp");
+
+sub e {
+    my $cmnd = shift;
+    if ($verbose) {
+        print "bcmImageMaker: $cmnd\n";
+    }
+    system($cmnd);
+}
+

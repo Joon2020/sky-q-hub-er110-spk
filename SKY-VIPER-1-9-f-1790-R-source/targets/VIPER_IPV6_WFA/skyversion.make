@@ -1,0 +1,5 @@
+SKY_SV_MAJOR="1"
+SKY_SV_MINOR="9"
+SKY_SV_INCREMENT="f"
+SKY_SV_REVISION:="$(shell printf %04u $(shell git rev-list HEAD | wc -l))"
+SKY_SV_TYPE="WFA"

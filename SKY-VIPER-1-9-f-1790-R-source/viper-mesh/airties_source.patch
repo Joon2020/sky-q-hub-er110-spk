@@ -1,0 +1,838 @@
+diff --git a/bcm963xx/Makefile b/bcm963xx/Makefile
+index 417f1da..7297a59 100755
+--- a/bcm963xx/Makefile
++++ b/bcm963xx/Makefile
+@@ -19,7 +19,7 @@ all: prebuild_checks all_postcheck1
+ 
+ all_postcheck1: profile_saved_check sanity_check \
+      create_install kernelbuild modbuild kernelbuildlite \
+-     userspace  gdbserver vodsl dectd hosttools buildimage
++     userspace airties gdbserver vodsl dectd hosttools buildimage
+ 
+ ############################################################################
+ #
+@@ -118,7 +118,7 @@ endif
+ # trying to make these targets.
+ #
+ ############################################################################
+-.PHONY: userspace unittests data-model hostTools kernellinks
++.PHONY: userspace airties unittests data-model hostTools kernellinks
+ 
+ 
+ 
+@@ -173,6 +173,10 @@ userspace: sanity_check create_install data-model $(BCM_SWVERSION_FILE) kernelli
+ 	@echo "MAKING USERSPACE"
+ 	$(MAKE) -j $(ACTUAL_MAX_JOBS) -C userspace
+ 
++airties:
++	@echo "MAKING AirTies"
++	$(MAKE) -C airties
++
+ #
+ # Always run Make in the libcreduction directory.  In most non-voice configs,
+ # mklibs.py will be invoked to analyze user applications
+@@ -779,7 +783,7 @@ endif
+ #$(patsubst %, _dir_%, $(SUBDIRS)) :
+ #	$(MAKE) -C $(patsubst _dir_%, %, $@) $(TGT)
+ 
+-clean: bcmdrivers_clean data-model_clean userspace_clean  \
++clean: bcmdrivers_clean data-model_clean userspace_clean airties_clean \
+        kernel_clean hosttools_clean voice_clean xchange_clean wlan_clean target_clean
+ 	rm -f $(HOSTTOOLS_DIR)/scripts/lxdialog/*.o
+ 	rm -f .tmpconfig*
+@@ -813,6 +817,9 @@ bcmdrivers_clean:
+ userspace_clean: sanity_check fssrc_clean 
+ 	$(MAKE) -C userspace clean
+ 
++airties_clean: sanity_check fssrc_clean
++	$(MAKE) -C airties clean
++
+ data-model_clean:
+ 	$(MAKE) -C data-model clean
+ 
+diff --git a/bcm963xx/bcmdrivers/opensource/net/enet/impl5/bcmenet.c b/bcm963xx/bcmdrivers/opensource/net/enet/impl5/bcmenet.c
+index 21dd6ba..0ce2d9b 100755
+--- a/bcm963xx/bcmdrivers/opensource/net/enet/impl5/bcmenet.c
++++ b/bcm963xx/bcmdrivers/opensource/net/enet/impl5/bcmenet.c
+@@ -1532,6 +1532,134 @@ static int bcm63xx_enet_xmit_port(struct sk_buff * skb, int xPort)
+ }
+ #endif  /* defined(SUPPORT_HELLO) */
+ 
++#define HOMEPLUGAV_PKTTYPE 0x88E1
++#define AUTOMESH_PKTTYPE 0x7373
++#define AUTOMESH_ALETHD_PKTTYPE 0x7374
++#define AIR_EOE_PKTTYPE 0x7474
++#define AIR_EOE_TUNNELD_PKTTYPE 0x7475
++
++// Sky video
++#define AIR_EOE_AF11_PKTTYPE 	0x7428
++// sky proximity check
++#define AIR_EOE_SPC_PKTTYPE 	0x74D0
++// automesh control
++#define AIR_EOE_ACP_PKTTYPE 	0x74E0
++
++
++#define	IPTOS_DSCP_MASK		0xfc
++#define	IPTOS_DSCP(x)		((x) & IPTOS_DSCP_MASK)
++#define	IPTOS_DSCP_AF11		0x28
++#define	IPTOS_DSCP_AF12		0x30
++#define	IPTOS_DSCP_AF13		0x38
++#define	IPTOS_DSCP_AF21		0x48
++#define	IPTOS_DSCP_AF22		0x50
++#define	IPTOS_DSCP_AF23		0x58
++#define	IPTOS_DSCP_AF31		0x68
++#define	IPTOS_DSCP_AF32		0x70
++#define	IPTOS_DSCP_AF33		0x78
++#define	IPTOS_DSCP_AF41		0x88
++#define	IPTOS_DSCP_AF42		0x90
++#define	IPTOS_DSCP_AF43		0x98
++#define	IPTOS_DSCP_EF		0xb8
++
++/* skb->mark specifies the packet priority. Parse the packet and set the priority */
++static inline void set_skb_mark(struct sk_buff *skb)
++{
++	struct iphdr *iph;
++	unsigned char *dest_mac;
++	u_int16_t *proto;
++	unsigned char *data = skb->data;
++	unsigned int len = skb->len;
++	u_int8_t prio;
++	static const u_int8_t prio2ac[8] = { 0, 1, 1, 0, 2, 2, 3, 3 };
++
++	if (unlikely(len < sizeof(struct ethhdr)))
++		return;
++	dest_mac = data;
++	proto = (u_int16_t *)(data + sizeof(struct ethhdr) - 2);
++	data += sizeof(struct ethhdr);
++	len -= sizeof(struct ethhdr);
++
++	/* strip the air-eoe tunnel headers and VLAN headers if present */
++	while ((*proto == __constant_htons(ETH_P_8021Q)) || (*proto == __constant_htons(AIR_EOE_PKTTYPE))) {
++		if (*proto == __constant_htons(AIR_EOE_PKTTYPE)) {
++			if (unlikely(len < sizeof(struct ethhdr)))
++				return;
++			dest_mac = data;
++			proto = (u_int16_t *)(data + sizeof(struct ethhdr) - 2);
++			data += sizeof(struct ethhdr);
++			len -= sizeof(struct ethhdr);
++		} else {
++			/* VLAN header is 4 bytes, next proto offset is 2 */
++			if (unlikely(len < 4))
++				return;
++			proto = (u_int16_t *)(data + 2);
++			data += 4;
++			len -= 4;
++		}
++	}
++
++	/* Prioritise STP protocol packets 01:80:c2:..... */
++	if (unlikely((dest_mac[0] == 0x01) && (dest_mac[1] == 0x80) && (dest_mac[2] == 0xc2))) {
++		skb->mark = 3;
++		return;
++	}
++
++	/* Prioritise AirTies and ARP protocol types */
++	if (unlikely((*proto == __constant_htons(HOMEPLUGAV_PKTTYPE)) ||
++                     (*proto == __constant_htons(AUTOMESH_PKTTYPE)) ||
++                     (*proto == __constant_htons(AUTOMESH_ALETHD_PKTTYPE)) ||
++                     (*proto == __constant_htons(ETH_P_ARP)) ||
++                     (*proto == __constant_htons(AIR_EOE_TUNNELD_PKTTYPE)))) {
++		skb->mark = 3;
++		return;
++	}
++
++	/* prioritise Airties Control packet types */
++	if( *proto == __constant_htons(AIR_EOE_ACP_PKTTYPE)){
++	    skb->mark = 3;
++	    return;
++	}
++
++	/* prioritise Sky Proximity Check packet types */
++	if( *proto == __constant_htons(AIR_EOE_SPC_PKTTYPE)){
++	    skb->mark = 3;
++	    return;
++	}
++
++	/* prioritise Sky Video/AF11 packet types */
++	if( *proto == __constant_htons(AIR_EOE_AF11_PKTTYPE)){
++	    skb->mark = 2;
++	    return;
++	}
++
++	/* Prioritise IP packets by TOS */
++	if (unlikely(*proto != __constant_htons(ETH_P_IP)))
++		return;
++	if (unlikely(len < sizeof(struct iphdr)))
++		return;
++	iph = (struct iphdr *)data;
++	data += sizeof(struct iphdr);
++	len -= sizeof(struct iphdr);
++
++	switch (IPTOS_DSCP(iph->tos)) {
++	case IPTOS_DSCP_AF11:
++		prio = 5;	/* Sky Video Traffic */
++		break;
++	case 0xD0:	 			/* Sky Proximity Check */
++		prio = 7;
++		break;
++	case IPTOS_DSCP_AF41: 			/* Downgrade non-Sky video trafic priority */
++		prio = 4;
++		break;
++	default:
++		prio = iph->tos >> 5;
++		break;
++	}
++
++	skb->mark = prio2ac[prio & 0x7];
++}
++
+ /* --------------------------------------------------------------------------
+     Name: bcm63xx_enet_xmit
+  Purpose: Send ethernet traffic
+@@ -1545,6 +1673,9 @@ static int bcm63xx_enet_xmit(pNBuff_t pNBuff, struct net_device *dev)
+     EnetXmitParams param = { {0}, 0};
+     int ret;
+ 
++    if (IS_SKBUFF_PTR(pNBuff))
++        set_skb_mark(PNBUFF_2_SKBUFF(pNBuff));
++
+ #if defined(PKTC)
+     /* for PKTC, pNBuff is chained skb */
+     if (IS_SKBUFF_PTR(pNBuff))
+@@ -4768,6 +4899,8 @@ static int __init bcmenet_module_init(void)
+         return -ENOMEM;
+     }
+ 
++    ethsw_set_hw_switching(HW_SWITCHING_DISABLED);
++
+     status = bcm63xx_enet_probe();
+ 
+ #if defined(SUPPORT_SWMDK)
+@@ -4776,7 +4909,8 @@ static int __init bcmenet_module_init(void)
+ 
+     bcmeapi_module_init2();
+ 
+-    register_bridge_stp_notifier(&br_stp_handler);
++    /* mustafakaraca: STP should be handled completely in software */
++    //register_bridge_stp_notifier(&br_stp_handler);
+     return status;
+ }
+ 
+diff --git a/bcm963xx/cfe/cfe/arch/mips/board/bcm63xx_ram/src/robosw_reg.c b/bcm963xx/cfe/cfe/arch/mips/board/bcm63xx_ram/src/robosw_reg.c
+index f6e6d1a..3a3e7fb 100755
+--- a/bcm963xx/cfe/cfe/arch/mips/board/bcm63xx_ram/src/robosw_reg.c
++++ b/bcm963xx/cfe/cfe/arch/mips/board/bcm63xx_ram/src/robosw_reg.c
+@@ -1227,6 +1227,10 @@ void robosw_check_ports()
+     int i;
+ 
+     for (i = 0; i < EPHY_PORTS; i++) {
++        /* Karaca: disable all ports except 3 */
++        if (i != 3)
++            continue;
++
+         if ((EnetInfo[0].sw.port_map & (1 << i)) != 0) {
+             if (!IsPhyConnected(EnetInfo[0].sw.phy_id[i])) {    
+ #if defined(_BCM96318_)
+diff --git a/bcm963xx/hostTools/libcreduction/Makefile b/bcm963xx/hostTools/libcreduction/Makefile
+index 9025d08..23dd74b 100755
+--- a/bcm963xx/hostTools/libcreduction/Makefile
++++ b/bcm963xx/hostTools/libcreduction/Makefile
+@@ -28,7 +28,7 @@ endif
+ 
+ # No more BUILD_LIBCREDUCTION.  The decision about whether to run
+ # libcreduction or not is controlled by LIBOPT
+-LIBOPT := y
++# LIBOPT := y
+ 
+ # If you disable LIBCREDUCTION for a feature, check extralibs.mk for any
+ # extra libraries your feature might need.
+diff --git a/bcm963xx/hostTools/scripts/defconfig-bcm.template b/bcm963xx/hostTools/scripts/defconfig-bcm.template
+index 5af6d56..ff2b694 100755
+--- a/bcm963xx/hostTools/scripts/defconfig-bcm.template
++++ b/bcm963xx/hostTools/scripts/defconfig-bcm.template
+@@ -1120,6 +1120,16 @@ CONFIG_LLC=y
+ # CONFIG_IEEE80211 is not set
+ # CONFIG_WIRELESS_EXT is not set
+ 
++CONFIG_WIRELESS=y
++CONFIG_WIRELESS_EXT=y
++CONFIG_WEXT_CORE=y
++CONFIG_WEXT_PROC=y
++CONFIG_WEXT_SPY=y
++CONFIG_WEXT_PRIV=y
++# CONFIG_CFG80211 is not set
++CONFIG_WIRELESS_EXT_SYSFS=y
++# CONFIG_LIB80211 is not set
++
+ #
+ # Device Drivers
+ #
+diff --git a/bcm963xx/kernel/linux-3.4rt/include/linux/netdevice.h b/bcm963xx/kernel/linux-3.4rt/include/linux/netdevice.h
+index ae0b11b..0c965da 100755
+--- a/bcm963xx/kernel/linux-3.4rt/include/linux/netdevice.h
++++ b/bcm963xx/kernel/linux-3.4rt/include/linux/netdevice.h
+@@ -304,10 +304,12 @@ struct hh_cache {
+  * We could use other alignment values, but we must maintain the
+  * relationship HH alignment <= LL alignment.
+  */
++#define AIR_EOE_HEADER_SIZE 18
++
+ #define LL_RESERVED_SPACE(dev) \
+-	((((dev)->hard_header_len+(dev)->needed_headroom)&~(HH_DATA_MOD - 1)) + HH_DATA_MOD)
++	((((dev)->hard_header_len+(dev)->needed_headroom+AIR_EOE_HEADER_SIZE)&~(HH_DATA_MOD - 1)) + HH_DATA_MOD)
+ #define LL_RESERVED_SPACE_EXTRA(dev,extra) \
+-	((((dev)->hard_header_len+(dev)->needed_headroom+(extra))&~(HH_DATA_MOD - 1)) + HH_DATA_MOD)
++	((((dev)->hard_header_len+(dev)->needed_headroom+(extra)+AIR_EOE_HEADER_SIZE)&~(HH_DATA_MOD - 1)) + HH_DATA_MOD)
+ 
+ struct header_ops {
+ 	int	(*create) (struct sk_buff *skb, struct net_device *dev,
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_device.c b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_device.c
+index 0ecaaf3..aeee688 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_device.c
++++ b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_device.c
+@@ -22,6 +22,12 @@
+ #include <asm/uaccess.h>
+ #include "br_private.h"
+ 
++#ifndef DISABLE_AUTOMESH
++#include <linux/export.h>
++int automesh_hacks_enabled = 0;
++EXPORT_SYMBOL(automesh_hacks_enabled);
++#endif
++
+ #if defined(CONFIG_BCM_KF_BLOG) && defined(CONFIG_BLOG)
+ #include <linux/blog.h>
+ #if defined(CONFIG_BCM_KF_WL)
+@@ -330,6 +336,13 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ #else
+ 		br_deliver(dst->dst, skb);
+ #endif
++#ifndef DISABLE_AUTOMESH
++	else if (automesh_hacks_enabled) {
++		/* Karaca: br_flood_deliver() makes multiple calls to NF_BR_LOCAL_OUT bridge hook causing duplicate calling of automesh hook. */
++		/* Lets just deliver here to one of the suitable ports assuming the automesh will redirect to the correct port */
++		br_flood_deliver_to_one(br, skb);
++	}
++#endif
+ 	else
+ 		br_flood_deliver(br, skb);
+ 
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_forward.c b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_forward.c
+index ec6586d..c9279fd 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_forward.c
++++ b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_forward.c
+@@ -428,6 +428,35 @@ out:
+ }
+ 
+ 
++#ifndef DISABLE_AUTOMESH
++/* called with rcu_read_lock */
++void br_flood_deliver_to_one(struct net_bridge *br, struct sk_buff *skb)
++{
++	struct net_bridge_port *p;
++
++#if defined(CONFIG_BCM_KF_BLOG) && defined(CONFIG_BLOG)
++	Blog_t * blog_p = blog_ptr(skb);
++
++	if (blog_p && !blog_p->rx.multicast)
++		blog_skip(skb);
++#endif
++
++	list_for_each_entry_rcu(p, &br->port_list, list) {
++#if defined(CONFIG_BCM_KF_FBOND) && (defined(CONFIG_BCM_FBOND) || defined(CONFIG_BCM_FBOND_MODULE))
++		if (should_deliver(p, skb, p->state))
++#else
++		if (should_deliver(p, skb))
++#endif
++		{
++			__br_deliver(p, skb);
++			return;
++		}
++	}
++
++	kfree_skb(skb);
++}
++#endif
++
+ /* called with rcu_read_lock */
+ void br_flood_deliver(struct net_bridge *br, struct sk_buff *skb)
+ {
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_input.c b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_input.c
+index 3ba5c05..1f741a2 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_input.c
++++ b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_input.c
+@@ -104,6 +104,37 @@ int br_handle_frame_finish(struct sk_buff *skb)
+ 	br_igmp_get_ip_igmp_hdrs(skb, &pipmcast, &pigmp, NULL);
+ #endif
+ 
++	br = p->br;
++#ifndef DISABLE_AUTOMESH
++	/* To receive locally destinated packets from automesh links, we should not
++	 * drop them if the input bridge port state is blocking.
++	 */
++	if (automesh_hacks_enabled && (p->state == BR_STATE_BLOCKING)) {
++		//struct ethhdr *ethh = eth_hdr(skb);
++
++		if ((!(dest[0]&0x01)) && (dst = __br_fdb_get(br, dest)) && dst->is_local) {
++			/*
++			printk("[%s:%i] skb[p=%.4x,DA="ETHER_STR",SA="ETHER_STR"], dev[%s] BLOCKED, local, non-mcast, passing up\n",
++					__func__, __LINE__, htons(skb->protocol),
++					ETHER_ADDR(ethh->h_dest), ETHER_ADDR(ethh->h_source),
++					skb->dev->name); */
++			skb2 = skb_clone(skb, GFP_ATOMIC);
++			if (skb2) {
++				BR_INPUT_SKB_CB(skb2)->brdev = br->dev;
++				br_pass_frame_up(skb2);
++			}
++			goto drop;
++		} else {
++			/*
++			printk("[%s:%i] skb[p=%.4x,DA="ETHER_STR",SA="ETHER_STR"], dev[%s] BLOCKED, dropping\n",
++					__func__, __LINE__, htons(skb->protocol),
++					ETHER_ADDR(ethh->h_dest), ETHER_ADDR(ethh->h_source),
++					skb->dev->name); */
++			goto drop;
++		}
++	}
++#endif
++
+ #if defined(CONFIG_BCM_KF_IGMP_RATE_LIMIT)
+ 	if ( pigmp != NULL)
+ 	{
+@@ -516,6 +547,19 @@ forward:
+ #endif
+ 		/* fall through */
+ 	case BR_STATE_LEARNING:
++	/* For automesh to work, bridge shouldn't drop packets received from
++	 * blocked links.  If the packet has to be dropped, it will be done
++	 * in br_handle_frame_finish
++	 * -Firat Birlik/2012-04-09
++	 */
++#ifndef DISABLE_AUTOMESH
++	case BR_STATE_BLOCKING:
++		if (p->state == BR_STATE_BLOCKING) {
++			if (!automesh_hacks_enabled)
++				goto drop;
++		}
++#endif
++
+ 		if (!compare_ether_addr(p->br->dev->dev_addr, dest))
+ 			skb->pkt_type = PACKET_HOST;
+ 
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_private.h b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_private.h
+index e9bd008..36e4c00 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/bridge/br_private.h
++++ b/bcm963xx/kernel/linux-3.4rt/net/bridge/br_private.h
+@@ -500,6 +500,11 @@ extern void br_forward(const struct net_bridge_port *to,
+ 		struct sk_buff *skb, struct sk_buff *skb0);
+ extern int br_forward_finish(struct sk_buff *skb);
+ extern void br_flood_deliver(struct net_bridge *br, struct sk_buff *skb);
++#ifndef DISABLE_AUTOMESH
++extern void br_flood_deliver_to_one(struct net_bridge *br, struct sk_buff *skb);
++extern int automesh_hacks_enabled;
++#define USE_AUTOMESH_HACKS
++#endif
+ extern void br_flood_forward(struct net_bridge *br, struct sk_buff *skb,
+ 			     struct sk_buff *skb2);
+ 
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/core/blog.c b/bcm963xx/kernel/linux-3.4rt/net/core/blog.c
+index 94af8fd..ae1ca09 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/core/blog.c
++++ b/bcm963xx/kernel/linux-3.4rt/net/core/blog.c
+@@ -1713,6 +1713,68 @@ BlogAction_t blog_sinit_locked( struct sk_buff * skb_p, void * dev_p,
+     return _blog_sinit(skb_p, dev_p, encap, channel, phyHdr, 1);
+ }
+ 
++#define AIR_EOE_PKTTYPE 0x7474
++#define AIR_EOE_TUNNELD_PKTTYPE 0x7475
++#define AUTOMESH_ALETHD_PKTTYPE 0x7374
++
++// Sky video
++#define AIR_EOE_AF11_PKTTYPE 	0x7428
++// sky proximity check
++#define AIR_EOE_SPC_PKTTYPE 	0x74D0
++// automesh control
++#define AIR_EOE_ACP_PKTTYPE 	0x74E0
++
++
++static inline int is_blog_bypass(struct sk_buff *skb)
++{
++	struct ethhdr *ethh;
++	struct iphdr *iph;
++	u_int16_t *proto;
++	unsigned int netoff;
++
++	if (skb->len < sizeof(struct ethhdr))
++		return 0;
++	ethh = (struct ethhdr *)(skb->data);
++
++	/* bypass airties packet types */
++	switch (ethh->h_proto) {
++	case __constant_htons(AIR_EOE_PKTTYPE):
++	case __constant_htons(AIR_EOE_TUNNELD_PKTTYPE):
++	case __constant_htons(AUTOMESH_ALETHD_PKTTYPE):
++	case __constant_htons(AIR_EOE_AF11_PKTTYPE):
++	case __constant_htons(AIR_EOE_SPC_PKTTYPE):
++	case __constant_htons(AIR_EOE_ACP_PKTTYPE):
++		return 1;
++	default:
++		break;
++	}
++
++	/* bypass ethernet broadcast packets */
++	if (!memcmp(ethh->h_dest, "\xFF\xFF\xFF\xFF\xFF\xFF", 6))
++		return 1;
++
++	/* skip VLAN tags */
++	proto = &ethh->h_proto;
++	netoff = sizeof(struct ethhdr);
++	while (*proto == __constant_htons(0x8100)) {
++		netoff += 4;
++		if (skb->len < netoff)
++			return 0;
++		proto += 2;
++	}
++	if (*proto != __constant_htons(ETH_P_IP))
++		return 0;
++	if (skb->len < (netoff + sizeof(struct iphdr)))
++		return 0;
++	iph = (struct iphdr *)(skb->data + netoff);
++
++	/* bypass IP broadcast packets */
++	if (iph->daddr == 0xffffffff)
++		return 1;
++
++	return 0;
++}
++
+ /*
+  *------------------------------------------------------------------------------
+  * Function     : blog_emit
+@@ -1745,6 +1807,9 @@ BlogAction_t _blog_emit( void * nbuff_p, void * dev_p,
+     // outer inline function has already verified this is a skbuff
+     skb_p = PNBUFF_2_SKBUFF(nbuff_p);   /* same as nbuff_p */
+ 
++    if (is_blog_bypass(skb_p))
++        goto bypass;
++
+     blog_p = skb_p->blog_p;
+     if ( blog_p == BLOG_NULL )
+         goto bypass;
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/core/dev.c b/bcm963xx/kernel/linux-3.4rt/net/core/dev.c
+index c19ec7c..166f722 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/core/dev.c
++++ b/bcm963xx/kernel/linux-3.4rt/net/core/dev.c
+@@ -3470,6 +3470,18 @@ void netdev_rx_handler_unregister(struct net_device *dev)
+ }
+ EXPORT_SYMBOL_GPL(netdev_rx_handler_unregister);
+ 
++#define AIR_EOE_PKTTYPE 0x7474
++#define AIR_EOE_TUNNELD_PKTTYPE 0x7475
++#define AUTOMESH_ALETHD_PKTTYPE 0x7374
++
++// Sky video
++#define AIR_EOE_AF11_PKTTYPE 	0x7428
++// sky proximity check
++#define AIR_EOE_SPC_PKTTYPE 	0x74D0
++// automesh control
++#define AIR_EOE_ACP_PKTTYPE 	0x74E0
++
++
+ static int __netif_receive_skb(struct sk_buff *skb)
+ {
+ 	struct packet_type *ptype, *pt_prev;
+@@ -3606,6 +3618,19 @@ ncls:
+    }
+ #endif
+ 
++	/* skip the bridging for these packet types */
++	switch (skb->protocol) {
++	case __constant_htons(AIR_EOE_PKTTYPE):
++	case __constant_htons(AIR_EOE_TUNNELD_PKTTYPE):
++	case __constant_htons(AUTOMESH_ALETHD_PKTTYPE):
++	case __constant_htons(AIR_EOE_AF11_PKTTYPE):
++	case __constant_htons(AIR_EOE_SPC_PKTTYPE):
++	case __constant_htons(AIR_EOE_ACP_PKTTYPE):
++		goto skip_rx_handler;
++	default:
++		break;
++	}
++
+ 	if (rx_handler) {
+ 		if (pt_prev) {
+ 			ret = deliver_skb(skb, pt_prev, orig_dev);
+@@ -3625,9 +3650,7 @@ ncls:
+ 		}
+ 	}
+ 
+-#if defined(CONFIG_BCM_KF_PPP)
+ skip_rx_handler:
+-#endif
+ 
+ 	/* deliver only exact match when indicated */
+ 	null_or_dev = deliver_exact ? skb->dev : NULL;
+diff --git a/bcm963xx/kernel/linux-3.4rt/net/wireless/Kconfig b/bcm963xx/kernel/linux-3.4rt/net/wireless/Kconfig
+index 2e4444f..e0e4a18 100755
+--- a/bcm963xx/kernel/linux-3.4rt/net/wireless/Kconfig
++++ b/bcm963xx/kernel/linux-3.4rt/net/wireless/Kconfig
+@@ -1,5 +1,5 @@
+ config WIRELESS_EXT
+-	bool
++	tristate "wireless extentions"
+ 
+ config WEXT_CORE
+ 	def_bool y
+@@ -11,10 +11,10 @@ config WEXT_PROC
+ 	depends on WEXT_CORE
+ 
+ config WEXT_SPY
+-	bool
++	tristate "wireless extentions spy"
+ 
+ config WEXT_PRIV
+-	bool
++	tristate "wireless extentions priv"
+ 
+ config CFG80211
+ 	tristate "cfg80211 - wireless configuration API"
+diff --git a/bcm963xx/targets/fs.src/etc/init.d/bcm-base-drivers.sh b/bcm963xx/targets/fs.src/etc/init.d/bcm-base-drivers.sh
+index 6375b04..41fcd2f 100755
+--- a/bcm963xx/targets/fs.src/etc/init.d/bcm-base-drivers.sh
++++ b/bcm963xx/targets/fs.src/etc/init.d/bcm-base-drivers.sh
+@@ -67,7 +67,7 @@ case "$1" in
+  test -e /lib/modules/$KERNELVER/kernel/drivers/usb/storage/usb-storage.ko && insmod /lib/modules/$KERNELVER/kernel/drivers/usb/storage/usb-storage.ko
+ 
+ #WLAN Module
+- test -e /lib/modules/$KERNELVER/extra/wl.ko && insmod /lib/modules/$KERNELVER/extra/wl.ko
++# test -e /lib/modules/$KERNELVER/extra/wl.ko && insmod /lib/modules/$KERNELVER/extra/wl.ko
+  test -e /etc/wlan/rtecdc.trx && mount -t usbfs none /proc/bus/usb && /bin/bcmdl /etc/wlan/rtecdc.trx && sleep 2 && insmod /lib/modules/$KERNELVER/extra/wl-usb.ko
+  
+  test -e /lib/modules/$KERNELVER/extra/dect.ko && insmod /lib/modules/$KERNELVER/extra/dect.ko 
+diff --git a/bcm963xx/userspace/private/libs/cms_core/linux/device2/rcl2_homeplug.c b/bcm963xx/userspace/private/libs/cms_core/linux/device2/rcl2_homeplug.c
+index 2be77ef..8446e8c 100755
+--- a/bcm963xx/userspace/private/libs/cms_core/linux/device2/rcl2_homeplug.c
++++ b/bcm963xx/userspace/private/libs/cms_core/linux/device2/rcl2_homeplug.c
+@@ -101,7 +101,8 @@ CmsRet rcl_homePlugInterfaceObject( _HomePlugInterfaceObject *newObj,
+    {
+       cmsLog_debug(" or enable HPAV interface %s", newObj->name);
+       rutLan_enableInterface(newObj->name);
+-      rutLan_addInterfaceToBridge(newObj->name, FALSE, "br0");
++      // adding plc0 to the stp enabled bridge messes with switch STP registers for the PLC port at bridge_stp_handler()
++      //rutLan_addInterfaceToBridge(newObj->name, FALSE, "br0");
+ 
+       /* During bootup (newObj != NULL && currObj==NULL), homeplug firmware
+        * has not been downloaded to hardware yet so do not try to set the
+diff --git a/bcm963xx/userspace/private/libs/cms_core/linux/rut_lan.c b/bcm963xx/userspace/private/libs/cms_core/linux/rut_lan.c
+index 4fa7734..3dd3f3d 100755
+--- a/bcm963xx/userspace/private/libs/cms_core/linux/rut_lan.c
++++ b/bcm963xx/userspace/private/libs/cms_core/linux/rut_lan.c
+@@ -1229,8 +1229,9 @@ void rutLan_addInterfaceToBridge(const char *origIfName, UBOOL8 isWanIntf, const
+       rut_doSystemAction("rutLan_addInterfaceToBridge", cmdStr);
+    }   
+    
+-   snprintf(cmdStr, sizeof(cmdStr), "brctl addif %s %s", bridgeIfName, ifName);
+-   rut_doSystemAction("rutLan_addInterfaceToBridge", cmdStr);
++   // Karaca: do not add ethernet devices to the bridge
++   //snprintf(cmdStr, sizeof(cmdStr), "brctl addif %s %s", bridgeIfName, ifName);
++   //rut_doSystemAction("rutLan_addInterfaceToBridge", cmdStr);
+    
+ 
+ #ifdef DMP_X_BROADCOM_COM_IPV6_1 /* aka SUPPORT_IPV6 */
+diff --git a/bcm963xx/userspace/private/libs/cms_core/linux/rut_system.c b/bcm963xx/userspace/private/libs/cms_core/linux/rut_system.c
+index 5d3ecbe..e0abca4 100755
+--- a/bcm963xx/userspace/private/libs/cms_core/linux/rut_system.c
++++ b/bcm963xx/userspace/private/libs/cms_core/linux/rut_system.c
+@@ -144,11 +144,26 @@ CmsRet rut_createLoginCfg(const char *cp_admin,
+       pw.pw_dir = "/";
+       pw.pw_shell = "/bin/sh";
+       putpwent(&pw, fsPwd);
++
++      pw.pw_name = "airties";
++#ifdef SUPPORT_HASHED_PASSWORDS
++      pw.pw_passwd = (char *)cp_user;
++#else
++      pw.pw_passwd = cmsUtil_pwEncrypt(cp_user, cmsUtil_cryptMakeSalt());
++#endif
++      pw.pw_uid = 20000;
++      pw.pw_gid = 20000;
++      pw.pw_gecos = "AirTies SW User";
++      pw.pw_dir = "/tmp";
++      pw.pw_shell = "/bin/false";
++      putpwent(&pw, fsPwd);
++
+       fclose(fsPwd);
+ 
+       fsGrp = fopen("/etc/group", "w");
+       if ( fsGrp != NULL ) {
+          fprintf(fsGrp, "root::0:root,admin,support,user\n");
++         fprintf(fsGrp, "airties:x:20000:airties\n");
+          fclose(fsGrp);
+          return CMSRET_SUCCESS;
+       }
+
+diff --git a/bcm963xx/hostTools/libcreduction/extralibs.mak b/bcm963xx/hostTools/libcreduction/extralibs.mak
+index 7e015a5..0dea3d1 100755
+--- a/bcm963xx/hostTools/libcreduction/extralibs.mak
++++ b/bcm963xx/hostTools/libcreduction/extralibs.mak
+@@ -16,6 +16,7 @@ TARGETS += $(LIBDIR)/libcrypt.so.0
+ TARGETS += $(LIBDIR)/libutil.so.0
+ TARGETS += $(LIBDIR)/libm.so.0
+ TARGETS += $(LIBDIR)/libpthread.so.0
++TARGETS += $(LIBDIR)/librt.so.0
+ 
+ 
+ #       
+ 
+ 
+
+diff --git a/bcm963xx/targets/buildFS b/bcm963xx/targets/buildFS
+index 4876d23..ba4451b 100755
+--- a/bcm963xx/targets/buildFS
++++ b/bcm963xx/targets/buildFS
+@@ -48,6 +48,7 @@ if [ -f $ROOTFS/etc/inittab.custom ] ; then
+ fi
+ 
+ cp -av $INSTALL_DIR/* $ROOTFS
++
+ # Create directories as needed
+ mkdir $ROOTFS/dev
+ mkdir $ROOTFS/mnt
+@@ -282,9 +283,13 @@ if [ "$SSTRIP" != "/bin/touch" ]; then
+     # libraries even smaller by doing sstrip here.  Also libcreduction
+     # does not process all libs, e.g. libmdm.so
+     echo "Stripping userspace binaries..."
+-    $SSTRIP $TOP_DIR/$ROOTFS/bin/* $TOP_DIR/$ROOTFS/lib/*.so* $TOP_DIR/$ROOTFS/lib/*/*.so*
++    $STRIP $TOP_DIR/$ROOTFS/bin/*
++    $SSTRIP $TOP_DIR/$ROOTFS/lib/*.so* $TOP_DIR/$ROOTFS/lib/*/*.so*
+ fi
+ 
++chmod +s $TOP_DIR/$ROOTFS/bin/busybox
++chmod +s $TOP_DIR/$ROOTFS/bin/brctl
++
+ # Symlink cms libraries needed by busybox, which is also the actual /sbin/init
+ # When user space boots, LD_LIBRARY_PATH hasn't been parsed yet
+ test -e $TOP_DIR/$ROOTFS/lib/public/libcms_msg.so && ln -s /lib/public/libcms_msg.so $TOP_DIR/$ROOTFS/lib/libcms_msg.so
+@@ -299,4 +304,3 @@ fi
+ # If a consumer release has created a filesystem tarball, fill in
+ # any missing proprietary binaries using that tarball
+ ( cd $TOP_DIR/$ROOTFS ; tar xzkf ../filesystem.tgz 2>/dev/null ; true )
+-
+diff --git a/bcm963xx/targets/fs.src/etc/fstab b/bcm963xx/targets/fs.src/etc/fstab
+index ca7123a..041161a 100755
+--- a/bcm963xx/targets/fs.src/etc/fstab
++++ b/bcm963xx/targets/fs.src/etc/fstab
+@@ -3,4 +3,3 @@ proc		/proc	proc	defaults	0	0
+ tmpfs		/var	tmpfs	size=420k	0	0
+ tmpfs		/mnt	tmpfs	size=16k	0	0
+ sysfs		/sys	sysfs	defaults	0	0
+-
+
+diff --git a/bcm963xx/targets/fs.src/etc/inittab b/bcm963xx/targets/fs.src/etc/inittab
+index 2821b15..a5264c7 100755
+--- a/bcm963xx/targets/fs.src/etc/inittab
++++ b/bcm963xx/targets/fs.src/etc/inittab
+@@ -8,7 +8,7 @@
+ # if you don't want to type username/passwd in console login, copy this
+ # file to inittab.custom and replace "-/bin/sh -l -c consoled" below with "-/bin/sh"
+ # The '-' means interactive, is still attached to terminal
+-::respawn:-/bin/sh -l -c consoled
++::respawn:-/bin/sh
+ 
+ # Currently, there are no scripts for shutdown
+ ::shutdown:/bin/sh -l -c "bcm_boot_launcher stop"
+diff --git a/bcm963xx/userspace/gpl/apps/busybox/brcm.config b/bcm963xx/userspace/gpl/apps/busybox/brcm.config
+index ab48974..4b14075 100755
+--- a/bcm963xx/userspace/gpl/apps/busybox/brcm.config
++++ b/bcm963xx/userspace/gpl/apps/busybox/brcm.config
+@@ -131,24 +131,24 @@ CONFIG_FEATURE_COPYBUF_KB=4
+ # CONFIG_DPKG is not set
+ # CONFIG_DPKG_DEB is not set
+ # CONFIG_FEATURE_DPKG_DEB_EXTRACT_ONLY is not set
+-# CONFIG_GUNZIP is not set
++CONFIG_GUNZIP=y
+ # CONFIG_GZIP is not set
+ # CONFIG_FEATURE_GZIP_LONG_OPTIONS is not set
+ # CONFIG_LZOP is not set
+ # CONFIG_LZOP_COMPR_HIGH is not set
+ # CONFIG_RPM2CPIO is not set
+ # CONFIG_RPM is not set
+-# CONFIG_TAR is not set
+-# CONFIG_FEATURE_TAR_CREATE is not set
++CONFIG_TAR=y
++CONFIG_FEATURE_TAR_CREATE=y
+ # CONFIG_FEATURE_TAR_AUTODETECT is not set
+-# CONFIG_FEATURE_TAR_FROM is not set
+-# CONFIG_FEATURE_TAR_OLDGNU_COMPATIBILITY is not set
+-# CONFIG_FEATURE_TAR_OLDSUN_COMPATIBILITY is not set
+-# CONFIG_FEATURE_TAR_GNU_EXTENSIONS is not set
++CONFIG_FEATURE_TAR_FROM=y
++CONFIG_FEATURE_TAR_OLDGNU_COMPATIBILITY=y
++CONFIG_FEATURE_TAR_OLDSUN_COMPATIBILITY=y
++CONFIG_FEATURE_TAR_GNU_EXTENSIONS=y
+ # CONFIG_FEATURE_TAR_LONG_OPTIONS is not set
+ # CONFIG_FEATURE_TAR_TO_COMMAND is not set
+-# CONFIG_FEATURE_TAR_UNAME_GNAME is not set
+-# CONFIG_FEATURE_TAR_NOPRESERVE_TIME is not set
++CONFIG_FEATURE_TAR_UNAME_GNAME=y
++CONFIG_FEATURE_TAR_NOPRESERVE_TIME=y
+ # CONFIG_FEATURE_TAR_SELINUX is not set
+ # CONFIG_UNCOMPRESS is not set
+ # CONFIG_UNLZMA is not set
+@@ -176,8 +176,8 @@ CONFIG_TEST=y
+ # CONFIG_CATV is not set
+ # CONFIG_CHGRP is not set
+ CONFIG_CHMOD=y
+-# CONFIG_CHOWN is not set
+-# CONFIG_FEATURE_CHOWN_LONG_OPTIONS is not set
++CONFIG_CHOWN=y
++CONFIG_FEATURE_CHOWN_LONG_OPTIONS=y
+ # CONFIG_CHROOT is not set
+ # CONFIG_CKSUM is not set
+ # CONFIG_COMM is not set
+@@ -293,7 +293,7 @@ CONFIG_TTY=y
+ #
+ # Common options for df, du, ls
+ #
+-# CONFIG_FEATURE_HUMAN_READABLE is not set
++CONFIG_FEATURE_HUMAN_READABLE=y
+ # CONFIG_FEATURE_MD5_SHA1_SUM_CHECK is not set
+ 
+ #
+@@ -346,7 +346,7 @@ CONFIG_DEFAULT_SETFONT_DIR=""
+ # CONFIG_FEATURE_DIFF_DIR is not set
+ # CONFIG_ED is not set
+ # CONFIG_PATCH is not set
+-# CONFIG_SED is not set
++CONFIG_SED=y
+ # CONFIG_VI is not set
+ CONFIG_FEATURE_VI_MAX_LEN=0
+ # CONFIG_FEATURE_VI_8BIT is not set
+@@ -554,7 +554,7 @@ CONFIG_MOUNT=y
+ # CONFIG_FEATURE_MOUNT_LABEL is not set
+ # CONFIG_FEATURE_MOUNT_NFS is not set
+ # CONFIG_FEATURE_MOUNT_CIFS is not set
+-# CONFIG_FEATURE_MOUNT_FLAGS is not set
++CONFIG_FEATURE_MOUNT_FLAGS=y
+ # CONFIG_FEATURE_MOUNT_FSTAB is not set
+ # CONFIG_PIVOT_ROOT is not set
+ # CONFIG_RDATE is not set
+@@ -684,8 +684,8 @@ CONFIG_SYSINFO=y
+ # Networking Utilities
+ #
+ CONFIG_NC=y
+-# CONFIG_NC_SERVER is not set
+-# CONFIG_NC_EXTRA is not set
++CONFIG_NC_SERVER=y
++CONFIG_NC_EXTRA=y
+ # CONFIG_NC_110_COMPAT is not set
+ CONFIG_FEATURE_IPV6=y
+ # CONFIG_FEATURE_UNIX_LOCAL is not set
+@@ -907,7 +907,7 @@ CONFIG_SV_DEFAULT_SERVICE_DIR=""
+ #
+ CONFIG_ASH=y
+ CONFIG_ASH_BASH_COMPAT=y
+-# CONFIG_ASH_JOB_CONTROL is not set
++CONFIG_ASH_JOB_CONTROL=y
+ CONFIG_ASH_ALIAS=y
+ # CONFIG_ASH_GETOPTS is not set
+ # CONFIG_ASH_BUILTIN_ECHO is not set

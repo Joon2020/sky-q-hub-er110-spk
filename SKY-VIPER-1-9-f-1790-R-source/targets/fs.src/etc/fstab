@@ -1,0 +1,9 @@
+# fstab file - used to mount file systems
+proc		/proc	proc	defaults	0	0
+tmpfs		/var	tmpfs	size=8m     0	0
+tmpfs		/log	tmpfs	size=3m	    0	0
+tmpfs		/mnt	tmpfs	size=16k	0	0
+tmpfs		/fus	tmpfs	size=16m	0	0
+sysfs		/sys	sysfs	defaults	0	0
+#tmpfs      	/airties    tmpfs   size=256k,uid=0,gid=0,mode=764    0   0
+

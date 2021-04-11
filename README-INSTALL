@@ -1,0 +1,9 @@
+SKY-VIPER GPL source Release Notes
+
+This release contains the source code and toolchains for SKY-VIPER DSL Router.
+
+use sky_install script to install source code and toolchain.
+
+ Source code will be installed in the current directory.
+ Tool chains will be installed under /opt/toolchains.
+

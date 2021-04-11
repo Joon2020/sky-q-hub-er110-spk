@@ -1,0 +1,29 @@
+cat /etc/build*
+ifconfig br0
+brctl showmacs br0
+brctl showstp br0
+hostapd_cli -i wl0.1 all_sta
+hostapd_cli -i wl1 all_sta
+cat /proc/air_mesh_rt
+wl -i wl0.1 isup
+wl -i wl0.1 apsta
+wl -i wl0.1 psta
+wl -i wl0.1 ap
+wl -i wl0.1 status
+wl -i wl0.1 assoclist
+wl -i wl1 isup
+wl -i wl1 apsta
+wl -i wl1 psta
+wl -i wl1 ap
+wl -i wl1 status
+wl -i wl1 assoclist
+wl -i wl1 wds_list
+wl -i wl1 sta_info all
+wificap -i wl1 -n
+aci-cli aci_wifi_get_opmode 0
+aci-cli aci_wifi_get_opmode 1
+cat /airties/manufacture.conf
+meshctl status
+dmesg
+logread
+cat /proc/uptime

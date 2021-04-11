@@ -1,0 +1,10 @@
+#
+# Add the object in cms-dm-sky-localtoken.xml below the 
+# object InternetGatewayDevice.
+#
+# Format of command line is 
+# <cmd> <data-model-file> <target object name>
+#
+# For the addObjBelowObj command, only 1 command line per file is allowed
+
+addLastChildObjToObj cms-dm-sky-localtoken.xml InternetGatewayDevice.

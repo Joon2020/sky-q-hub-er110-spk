@@ -1,0 +1,53 @@
+#
+# This file replaces the entityInfoArray in eid.c
+# and is used by sky
+#
+
+BEGIN
+  eid         = EID_SKYTEST
+  name        = skytest
+  flags = EIF_MDM|EIF_MESSAGING_CAPABLE
+  cpuGroupName = normal/default
+END
+
+BEGIN
+  eid         = EID_DEVICEMONITOR
+  name        = devicemonitor
+  flags = EIF_MDM|EIF_LAUNCH_ON_BOOT|EIF_MESSAGING_CAPABLE
+  cpuGroupName = normal/default
+END
+
+BEGIN
+  eid         = EID_LANSUBSYSEVT 
+  name        = lansubsysevt
+  flags = EIF_MDM|EIF_LAUNCH_ON_BOOT|EIF_MESSAGING_CAPABLE
+  cpuGroupName = normal/default
+END
+
+BEGIN
+  eid         = EID_SKY_GW_PINGER
+  name        = skyGwPinger
+  flags = EIF_MDM|EIF_LAUNCH_ON_BOOT|EIF_MESSAGING_CAPABLE
+  cpuGroupName = normal/default
+END
+
+BEGIN
+  eid         = EID_RTM
+  accessBit   = NDA_ACCESS_RTM
+  name        = rtm
+  flags = EIF_MDM|EIF_LAUNCH_ON_BOOT|EIF_MESSAGING_CAPABLE
+  cpuGroupName = normal/default
+END
+
+BEGIN
+  eid         = EID_SKY_WLAN_DIAG
+  name        = skywlandiagd
+  cpuGroupName = normal/default
+END
+
+BEGIN
+  eid         = EID_TINYSVCMDNS
+  name        = tinysvcmdns
+  cpuGroupName = normal/default
+END
+

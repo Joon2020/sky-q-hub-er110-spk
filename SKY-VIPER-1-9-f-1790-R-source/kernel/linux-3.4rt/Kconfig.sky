@@ -1,0 +1,55 @@
+# SKY changes to include FLASH SIZE in kernel
+config SKY_DEFAULT_CONSOLE_UART
+		int "Specify which UART to use for the default console"
+		range 0 2
+		default 0
+
+config FLASH_CHIP_SIZE
+        int "Flash chip size"
+        range 8 256
+        default 32
+
+config SKY_REBOOT_DIAGNOSTICS
+	bool "Sky reboot diagnostics"
+	default n
+
+config SKY_MODEL_SR101
+	bool  "Sky Router Model SR101"
+
+config SKY_MODEL_SR102
+	bool  "Sky Router Model SR102"
+
+config SKY_MODEL_ER110
+	bool  "Sky Router Model ER110"
+
+config SKY_MODEL_EE120
+	bool  "Sky Router Model EE120"
+
+# SKY changes to enable and Disable VDSL compilation flag, which can be used in kernel and driver
+config SKY_VDSL
+        bool "sky vdsl router"
+        default n
+
+config SKY_IPV6
+		bool "sky ipv6 customizations"
+		default n
+
+# SKY changes to enable and Disable VDSL compilation flag, which can be used in kernel and driver
+config SKY_ETHAN
+        bool "sky vdsl router"
+        default n
+
+# SKY changes to enable and Disable SKY_MESH_SUPPORT
+config SKY_MESH_SUPPORT
+        bool "sky mesh support "
+        default n
+
+#SKY Enable/disable Watchdog support
+config SKY_FEATURE_WATCHDOG
+	bool "sky watchdog feature"
+	default n
+
+#SKY Enable/disable TIMEDOCTOR support
+config SKY_FEATURE_TIMEDOCTOR
+	bool "sky TIMEDOCTOR feature"
+	default n

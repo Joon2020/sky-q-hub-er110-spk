@@ -1,0 +1,25 @@
+--- origin_iptables-1.4.16.3/iptables/iptables.c	2013-10-17 13:55:45.589904226 +0100
++++ iptables-1.4.16.3/iptables/iptables.c	2013-10-17 13:53:14.642250000 +0100
+@@ -1742,14 +1742,20 @@
+ 		}
+ 		cs.invert = FALSE;
+ 	}
+-
++#ifdef COMMENTED_BY_SKY
++	/* Murthy:: 27/06/2013: ROUTER-2549: 
++	Previous impmenetations of iptables didnot restriuct DROP target
++	in nat table. SkyHub firewall implementation filters traffic at PREROUTING chain
++	
++	so we should not have this check to have compatability with SkyHub implementation
++	*/
+ 	if (strcmp(*table, "nat") == 0 &&
+ 	    ((policy != NULL && strcmp(policy, "DROP") == 0) ||
+ 	    (cs.jumpto != NULL && strcmp(cs.jumpto, "DROP") == 0)))
+ 		xtables_error(PARAMETER_PROBLEM,
+ 			"\nThe \"nat\" table is not intended for filtering, "
+ 		        "the use of DROP is therefore inhibited.\n\n");
+-
++#endif //COMMENTED_BY_SKY
+ 	for (matchp = cs.matches; matchp; matchp = matchp->next)
+ 		xtables_option_mfcall(matchp->match);
+ 	if (cs.target != NULL)

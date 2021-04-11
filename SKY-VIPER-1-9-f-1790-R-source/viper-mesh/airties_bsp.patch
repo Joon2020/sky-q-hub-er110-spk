@@ -1,0 +1,701 @@
+
+diff --git a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/shared/bcm4360_BSKYB_VIPER_map.c b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/shared/bcm4360_BSKYB_VIPER_map.c
+new file mode 100644
+index 0000000..4cb487e
+--- /dev/null
++++ b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/shared/bcm4360_BSKYB_VIPER_map.c
+@@ -0,0 +1,40 @@
++#include <typedefs.h>
++
++/* NOTE: PLEASE CHOOSE THE PROPER REFERENCE SROM MAP AS THE BASE */
++
++uint16 wl_srom_map_1108[234] = {
++/* NOTE: This piece of srom is from BCM94360MC5 P404  */
++/* MAC address are zero'ed */
++/* CRC here is not recalculated, do not program this to EEPROM/SROM, this is for EEPROM/SROM-less use only */
++/*  srom[000]:*/  0x3801, 0x3000, 0x0633, 0x14e4, 0x0218, 0x1b7e, 0x0a00, 0x2bc4,
++/*  srom[008]:*/  0x2a64, 0x2964, 0x2c64, 0x3ce7, 0x480a, 0x113c, 0x2132, 0x3164,
++/*  srom[016]:*/  0x1852, 0x0005, 0x1f2e, 0x4df7, 0x8080, 0x000b, 0x8630, 0x0190,
++/*  srom[024]:*/  0x5f00, 0x41f6, 0x8630, 0x0191, 0x8300, 0x01eb, 0x9f01, 0x65f5,
++/*  srom[032]:*/  0x8200, 0xd800, 0x8010, 0x007c, 0x1f00, 0x0004, 0x8000, 0x200c,
++/*  srom[040]:*/  0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
++/*  srom[048]:*/  0x43a2, 0x8000, 0x0002, 0x0000, 0x3ff3, 0x1800, 0x0000, 0xffff,
++/*  srom[056]:*/  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
++/*  srom[064]:*/  0x0634, 0x1404, 0x0000, 0x1000, 0x0002, 0x0000, 0x0000, 0x0000,
++/*  srom[072]:*/  0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff,
++/*  srom[080]:*/  0x0707, 0x0000, 0x0006, 0x0606, 0x0077, 0x3131, 0x0131, 0x7800,
++/*  srom[088]:*/  0xffff, 0xffff, 0xffff, 0xffff, 0x5500, 0xffff, 0x001e, 0xffff,
++/*  srom[096]:*/  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x3434, 0x3434, 0x3434,
++/*  srom[104]:*/  0x1211, 0x1211, 0x1211, 0x0004, 0xff42, 0xff24, 0x188e, 0xfce6,
++/*  srom[112]:*/  0xffff, 0xb300, 0x5448, 0x5050, 0xff45, 0x1652, 0xfd14, 0xff57,
++/*  srom[120]:*/  0x174b, 0xfd08, 0xff4e, 0x180b, 0xfcf1, 0xff4b, 0x182b, 0xfcf6,
++/*  srom[128]:*/  0xff42, 0xff3e, 0x15f9, 0xfd36, 0xffff, 0xb300, 0x5448, 0x5050,
++/*  srom[136]:*/  0xff6c, 0x18ea, 0xfcd8, 0xff34, 0x16b0, 0xfcf4, 0xff63, 0x193f,
++/*  srom[144]:*/  0xfce3, 0xffcd, 0x1e09, 0xfccf, 0xff42, 0xff25, 0x18a6, 0xfce2,
++/*  srom[152]:*/  0xffff, 0xb300, 0x5448, 0x5050, 0xff6b, 0x18bb, 0xfcd6, 0xff5b,
++/*  srom[160]:*/  0x1857, 0xfcdd, 0xff6a, 0x1968, 0xfce4, 0xff6c, 0x19e1, 0xfce2,
++/*  srom[168]:*/  0x0000, 0x0000, 0x4000, 0x9944, 0x4000, 0x9944, 0x4400, 0x0000,
++/*  srom[176]:*/  0x0000, 0x5510, 0x0000, 0x5510, 0x0000, 0x5410, 0x0000, 0x4318,
++/*  srom[184]:*/  0x2000, 0xaa75, 0x0000, 0xba74, 0x0000, 0xba74, 0x4f15, 0x430b,
++/*  srom[192]:*/  0x1000, 0x9953, 0x0000, 0x9963, 0x0000, 0xba64, 0x490b, 0x0000,
++/*  srom[200]:*/  0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
++/*  srom[208]:*/  0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
++/*  srom[216]:*/  0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff,
++/*  srom[224]:*/  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
++/*  srom[232]:*/  0xffff, 0xf90b
++};
++
+diff --git a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_ap_2nv b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_ap_2nv
+index fa9a52b..4b4eb42 100755
+--- a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_ap_2nv
++++ b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_ap_2nv
+@@ -11,7 +11,7 @@ include $(WLCFGDIR)/wlconfig_lx_wl_dslcpe
+ 
+ # features
+ #supported chips 4321(x) 4322(x) 43222(x) 43112 6362 4313 43224 43225 43226 4331
+-SUPPORTED_CHIPS := 4321 4322 43222 43112 6362 4313 43224 43225 43226 43227 43228 43428 4331 43217 43131 4360 4360_963168ACH5 4360_963168AC5
++SUPPORTED_CHIPS := 4321 4322 43222 43112 6362 4313 43224 43225 43226 43227 43228 43428 4331 43217 43131 4360 4360_963168ACH5 4360_963168AC5 4360_BSKYB_VIPER
+ 
+ # 
+ # D11 Core Revs
+diff --git a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta
+index 92dfd80..18b7b03 100755
+--- a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta
++++ b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta
+@@ -13,7 +13,7 @@ include $(WLCFGDIR)/wlconfig_lx_wl_dslcpe
+ # features
+ 
+ #supported chips default as-is by the driver
+-SUPPORTED_CHIPS := 4321 4322 43222 43112 6362 4313 43224 43225 43226 43227 43228 43428 4331 43217 43131 4360
++SUPPORTED_CHIPS := 4321 4322 43222 43112 6362 4313 43224 43225 43226 43227 43228 43428 4331 43217 43131 4360 4360_BSKYB_VIPER
+ 
+ # 
+ # D11 Core Revs
+diff --git a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta_dbg b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta_dbg
+index b2b90c3..cefdf8d 100755
+--- a/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta_dbg
++++ b/bcm963xx/bcmdrivers/broadcom/net/wl/impl16/wl/config/wlconfig_lx_wl_dslcpe_pci_apsta_dbg
+@@ -18,7 +18,7 @@ include $(WLCFGDIR)/wlconfig_lx_wl_dslcpe
+ BCM4312=0
+ 
+ #supported chips default as-is by the driver
+-SUPPORTED_CHIPS := 4321 4322 43222 43112 6362 4313 43224 43225 43226 43227 43228 43428 4331 43217 43131 4360
++SUPPORTED_CHIPS := 4321 4322 43222 43112 6362 4313 43224 43225 43226 43227 43228 43428 4331 43217 43131 4360 4360_BSKYB_VIPER
+ 
+ # 
+ # D11 Core Revs
+diff --git a/bcm963xx/shared/opensource/boardparms/bcm963xx/boardparms.c b/bcm963xx/shared/opensource/boardparms/bcm963xx/boardparms.c
+index e86d885..19429a4 100755
+--- a/bcm963xx/shared/opensource/boardparms/bcm963xx/boardparms.c
++++ b/bcm963xx/shared/opensource/boardparms/bcm963xx/boardparms.c
+@@ -3711,10 +3711,65 @@ static bp_elem_t g_bcm963168wfar[] = {
+   {bp_last}
+ };
+ 
++#define MAC_IFACE_VALID_M        1
++#define MAC_IFACE_VALID_S        26
++#define MAC_IFACE_VALID          (MAC_IFACE_VALID_M << MAC_IFACE_VALID_S)
++
++/* GW/NJP added */
++static bp_elem_t g_bcm963168bskyb_viper[] = {
++  {bp_cpBoardId,               .u.cp = "BSKYB_VIPER"},
++  {bp_ulDeviceOptions,         .u.ul = BP_DEVICE_OPTION_ENABLE_GMAC },
++  {bp_ulGpioOverlay,           .u.ul =(BP_OVERLAY_PHY |
++                                       BP_OVERLAY_USB_DEVICE |
++                                       BP_OVERLAY_GPHY_LED_0 |
++                                       BP_OVERLAY_PCIE_CLKREQ )},
++  {bp_usExtIntrResetToDefault, .u.us = BP_EXT_INTR_0},
++  {bp_usExtIntrSesBtnWireless, .u.us = BP_EXT_INTR_1},
++  {bp_usAntInUseWireless,      .u.us = BP_WLAN_ANT_MAIN},
++  {bp_usWirelessFlags,         .u.us = 0},
++  {bp_ucPhyType0,              .u.uc = BP_ENET_EXTERNAL_SWITCH},
++  {bp_ucPhyAddress,            .u.uc = 0x0},
++  {bp_usConfigType,            .u.us = BP_ENET_CONFIG_MMAP},
++  {bp_ulPortMap,			   .u.ul = 0x58}, /* GPHY1, RGMII_1 (External PLC), RGMII_3 (External Phy GbE) */
++  {bp_ulPhyId3,                .u.ul = 0x04},
++  // 06/03/14 - MRB - ER-108: Modification of PLC board parameters for Qualcomm AR7420.
++  // The Qualcomm PLC chip is interfaced via an MII bus attached to port 4 of the
++  // BCM63268 internal switch, a.k.a. RGMII_1. It is configured to behave as a PHY
++  // device and, obviously, it is external. 
++  {bp_ulPhyId4,                .u.ul = BP_PHY_ID_16 | /* Qualcomm AR7420 is PHY_ID 0x10 - Tony Bricknell */
++                                       MAC_IFACE_VALID |
++                                       MAC_IF_MII |
++                                       PHY_EXTERNAL |
++                                       MII_DIRECT /* Was RGMII_DIRECT */ /*PHY_INTEGRATED_VALID*/},
++  {bp_usPhyConnType,           .u.us = PHY_CONN_TYPE_EXT_PHY /* Was PHY_CONN_TYPE_PLC */},
++  {bp_ucPhyDevName,            .u.cp = "plc0"},
++  {bp_ulPhyId6,                .u.ul = 0x19 | MAC_IF_RGMII}, /* GW MII3 -> B50612E GbE PHY  */
++  {bp_ulAfeId0,                .u.ul = BP_AFE_CHIP_INT | BP_AFE_LD_6303 | BP_AFE_FE_ANNEXA | BP_AFE_FE_REV_6303_REV_12_3_30 }, /* NJP added for new 6303 LD */
++  // LDMode is set to NONE in case the board we are inheriting from set them
++  {bp_usGpioIntAFELDMode,      .u.us = BP_GPIO_NONE}, /* NJP added for new 6303 LD */ 
++  {bp_usGpioIntAFELDPwr,       .u.us = BP_GPIO_10_AH}, /* NJP added for new 6303 LD */
++  // IntAFELDClk uses dedicated pin
++  // IntAFELDData uses dedicated pin
++//  {bp_usGpioPLCPwrEn,          .u.us = BP_GPIO_16_AL},/* PLC power on/off GPIO */
++//  {bp_usGpioLedBlStop,         .u.us = BP_GPIO_2_AL}, /* Power Red */  
++//  {bp_usGpioLedBlPowerOn,      .u.us = BP_GPIO_3_AL}, /* Power Green */
++//  {bp_usGpioLedAdslFail,       .u.us = BP_GPIO_4_AL}, /* DSL Red */
++//  {bp_usGpioLedAdsl,           .u.us = BP_GPIO_5_AL}, /* DSL Green */
++//  {bp_usGpioLedWanError,       .u.us = BP_GPIO_4_AL}, /* DSL Red */ 
++//  {bp_usGpioLedWanData,        .u.us = BP_GPIO_5_AL}, /* DSL Green */
++//  {bp_usGpioLedWirelessFail,   .u.us = BP_GPIO_6_AL}, /* Wireless Red */  
++//  {bp_usGpioLedWireless,	   .u.us = BP_GPIO_7_AL}, /* Wireless Green */
++//  {bp_usGpioLedSesWireless,    .u.us = BP_GPIO_14_AL}, /* WPS Green LED */ 
++//  {bp_usGpioLedSesWirelessFail,.u.us = BP_GPIO_15_AL}, /* WPS Red LED */ 
++//  {bp_usGpioLedskyHDFail,	   .u.us = BP_GPIO_8_AL}, /* Sky HD Red */
++//  {bp_usGpioLedskyHD,		   .u.us = BP_GPIO_9_AL}, /* Sky HD Green */
++  {bp_last}
++};
++
+ static bp_elem_t * g_BoardParms[] = {g_bcm963268sv1, g_bcm963268mbv, g_bcm963168vx, g_bcm963168vx_p300, g_bcm963268bu, g_bcm963268bu_p300,
+ 		g_bcm963268sv2_extswitch, g_bcm963168mbv_17a, g_bcm963168mbv_30a, g_bcm963168xh, g_bcm963168xh5, g_bcm963168mp, g_bcm963268v30a,
+ 		g_bcm963168media, g_bcm963268sv2, g_bcm963168xfg3, g_bcm963168xf, g_bcm963168xm, g_bcm963168mbv3, g_bcm963168mbv17a302, g_bcm963168mbv30a302,
+-		g_bcm963168vx_p400, g_bcm963168vx_ext1p8, g_bcm963269bhr, g_bcm963168ach5, g_bcm963168ac5, g_bcm963168xn5, g_bcm963168xm5, g_bcm963168xm5_6302, g_bcm963168wfar, 0};
++		g_bcm963168vx_p400, g_bcm963168vx_ext1p8, g_bcm963269bhr, g_bcm963168ach5, g_bcm963168ac5, g_bcm963168xn5, g_bcm963168xm5, g_bcm963168xm5_6302, g_bcm963168wfar, g_bcm963168bskyb_viper, 0};
+ 
+ #endif
+ 
+@@ -5434,9 +5489,16 @@ static WLAN_SROM_ENTRY wlan_patch_common_963268MBV[] = {
+     { 87,  0x0315}, 
+     { 88,  0x0315},
+     { 96,  0x2048}, 
++#if 0
+     { 97,  0xFFB5}, 
+     { 98,  0x175F},
+     { 99,  0xFB29},
++#else
++//Murthy Calibration values for VIPER
++	{ 97,  0xFF1D}, 
++	{ 98,  0x15CF},
++	{ 99,  0xFADF},
++#endif
+     { 100, 0x3E40},
+     { 101, 0x403C},
+     { 102, 0xFF15},
+@@ -5446,9 +5508,16 @@ static WLAN_SROM_ENTRY wlan_patch_common_963268MBV[] = {
+     { 109, 0x1315},
+     { 110, 0xFBF0},
+     { 112, 0x2048},
++#if 0
+     { 113, 0xFFD7},
+     { 114, 0x17D6},
+     { 115, 0xFB67},
++#else
++//Murthy Calibration values for VIPER
++	{ 113, 0xFF03},
++	{ 114, 0x1516},
++	{ 115, 0xFAD4},
++#endif
+     { 116, 0x3E40},
+     { 117, 0x403C},
+     { 118, 0xFE87},
+@@ -5839,12 +5908,14 @@ static WLAN_SROM_PATCH_INFO wlanPaInfo[]={
+     {"963168XM5_6302", 0x6362, 220, wlan_patch_unique_963168XM5_6302,  wlan_patch_common_963168XM5},
+     {"963168WFAR",    0x6362, 220, wlan_patch_unique_963268MBV,     wlan_patch_common_963268MBV},
+     {"963168MP",    0x6362, 220, wlan_patch_unique_963168MP,     wlan_patch_common_963168MP},
++	{"BSKYB_VIPER",  0x6362, 220, wlan_patch_unique_963268BU,     wlan_patch_common_963268MBV},
+ #endif
+ 
+ #if defined(_BCM96828_) || defined(CONFIG_BCM96828)
+     {"96828MBV",     0x6362, 220, wlan_patch_unique_96828MBV,       wlan_patch_common_96828MBV},
+     {"96828BU",      0x6362, 220, wlan_patch_unique_96828BU,        wlan_patch_common_96828MBV},
+ #endif
++
+       
+     {"", 0, 0, wlan_patch_LAST, wlan_patch_LAST}, /* last entry*/
+ };
+diff --git a/bcm963xx/targets/BSKYB_VIPER/BSKYB_VIPER b/bcm963xx/targets/BSKYB_VIPER/BSKYB_VIPER
+new file mode 100644
+index 0000000..dd7cbf6
+--- /dev/null
++++ b/bcm963xx/targets/BSKYB_VIPER/BSKYB_VIPER
+@@ -0,0 +1,488 @@
++#
++# Automatically generated by make menuconfig: don't edit
++#
++
++#
++# Chip and Board configuration selection
++#
++
++#
++# Chip selection
++#
++BRCM_63268=y
++# BRCM_6328 is not set
++# BRCM_6362 is not set
++# BRCM_6368 is not set
++# BRCM_6828 is not set
++# BRCM_6816 is not set
++# BRCM_6818 is not set
++# BRCM_6318 is not set
++# BRCM_6838 is not set
++# BRCM_68500 is not set
++BRCM_CHIP=63268
++PROFILE_ARCH=mips
++BRCM_BOARD_ID="BSKYB_VIPER"
++BRCM_VOICE_BOARD_ID=""
++BRCM_GPON_SERIAL_NUMBER=
++BRCM_GPON_PASSWORD=
++BRCM_GPON_CT_LOID=
++BRCM_GPON_CT_PASSWORD=
++BRCM_FLASHBLK_SIZE=64
++BRCM_AUXFS_PERCENT=10
++BRCM_NUM_MAC_ADDRESSES=11
++BRCM_BASE_MAC_ADDRESS="02:10:18:01:00:01"
++BRCM_PSI_SIZE=24
++BRCM_BACKUP_PSI=
++BRCM_MAIN_TP_NUM=0
++
++#
++# Toolchain selection
++#
++BRCM_UCLIBC=y
++# DESKTOP_LINUX is not set
++
++#
++# Root file system selection
++#
++# BRCM_ROOTFS_SQUASHFS is not set
++BRCM_ROOTFS_ALL=y
++BRCM_SQUASHFS_FRAGMENT_CACHE_SIZE=1
++BRCM_KERNEL_ROOTFS=all
++# BRCM_ROOTFS_RW is not set
++BUILD_MTDUTILS=y
++# BRCM_RAMDISK_BOOT_EN is not set
++# BRCM_NFS_MOUNT_EN is not set
++
++#
++# Kernel configuration selection
++#
++LINUX_3_4_0_RT=y
++PROFILE_KERNEL_VER=LINUX_3_4_0_RT
++BRCM_SMP_EN=y
++BRCM_KERNEL_PREEMPT=y
++BRCM_SCHED_RT_PERIOD=1000000
++BRCM_SCHED_RT_RUNTIME=1000000
++# BRCM_CONFIG_HIGH_RES_TIMERS is not set
++BCM_HARDIRQ_COUNT_CYCLES=y
++# BCM_CGROUPS is not set
++BCM_KERNEL_CMDLINE_BOOL=y
++BCM_KERNEL_CMDLINE="irqaffinity=0"
++# BCM_KERNEL_CMDLINE_OVERRIDE is not set
++
++#
++# Kernel Cryptographic selection
++#
++BRCM_KERNEL_CRYPTO=y
++BRCM_KERNEL_CRYPTO_HMAC=y
++BRCM_KERNEL_CRYPTO_NULL=y
++BRCM_KERNEL_CRYPTO_MD5=y
++BRCM_KERNEL_CRYPTO_SHA1=y
++BRCM_KERNEL_CRYPTO_DES=y
++BRCM_KERNEL_CRYPTO_AES=y
++
++#
++# Misc Drivers (other drivers are grouped with their features)
++#
++BRCM_DRIVER_PCI=y
++# BRCM_DRIVER_ISDN is not set
++# BRCM_DRIVER_EXT_TIMER is not set
++# BRCM_DRIVER_PMC is not set
++
++#
++# Major Feature Selection
++#
++BUILD_BRCM_CMS=y
++# BUILD_DM_LEGACY98 is not set
++BUILD_DM_HYBRID=y
++# BUILD_DM_PURE181 is not set
++# BUILD_DM_DETECT is not set
++BUILD_BUSYBOX=dynamic
++# BUILD_BUSYBOX_BRCM_LITE is not set
++BUILD_BUSYBOX_BRCM_FULL=y
++# BUILD_WGET_HTTPS is not set
++BUILD_BUSYBOX_GUNZIP=y
++# BUILD_BUSYBOX_GZIP is not set
++# BUILD_BUSYBOX_UNTAR is not set
++# BUILD_BUSYBOX_TAR is not set
++# BUILD_BUSYBOX_VI is not set
++# BUILD_IPV6 is not set
++BUILD_VCONFIG=dynamic
++# BUILD_BRCM_INTERNAL is not set
++
++#
++# DSL/XTM selection
++#
++# BUILD_PHY_ADSL is not set
++# BUILD_PHY_VDSL is not set
++BUILD_PHY_MULTIMODE=y
++# BRCM_PHY_BONDING is not set
++# BRCM_MULTI_PHY is not set
++# BRCM_EXT_PHY_BONDING is not set
++# BRCM_PHY_BONDING5B is not set
++# BRCM_PHY_GINP_RTX is not set
++# BRCM_PHY_BONDING_C0 is not set
++BRCM_ADSL_ANNEX_A=y
++# BRCM_ADSL_ANNEX_B is not set
++# BRCM_ADSL_ANNEX_C is not set
++# BRCM_ADSL_SADSL is not set
++BRCM_ADSL_STANDARD=ANNEX_A
++CPE_ANNEX_A=y
++BRCM_DRIVER_ADSL=m
++BUILD_DSL=y
++BUILD_XDSLCTL=dynamic
++BUILD_DSLDIAGD=y
++# BUILD_DSL_LOOP_DIAG is not set
++# BRCM_PHY_LOOPBACK is not set
++BRCM_DRIVER_XTM=m
++BUILD_XTMCTL=dynamic
++BUILD_ATMWAN=y
++BUILD_PTMWAN=y
++BUILD_ATMLOOPBACK=y
++BRCM_DRIVER_P8021AG=m
++# BRCM_DRIVER_EXT_BONDING is not set
++
++#
++# Ethernet and VLAN Selection
++#
++BRCM_DRIVER_ETHERNET=m
++# BRCM_DRIVER_ETHERNET_CONFIG is not set
++BRCM_SWITCH_SCHED_SP=y
++# BRCM_SWITCH_SCHED_WRR is not set
++BUILD_BCM_ALLOW_REAL_HW_SWITCHING=y
++BUILD_ETHSWCTL=y
++BUILD_SWMDK=y
++BRCM_EXT_SWITCH=y
++BRCM_EXT_SWITCH_TYPE=53115
++BRCM_EXT_SWITCH_REV="a0"
++BRCM_PORTS_ON_INT_EXT_SW=y
++# BCM_PHY_54616 is not set
++BUILD_MDK_SHELL=y
++BUILD_ETHWAN=y
++BCM_DEF_NR_RX_DMA_CHANNELS=2
++BCM_DEF_NR_TX_DMA_CHANNELS=2
++BRCM_GMAC=m
++BUILD_GMACCTL=dynamic
++BRCM_DRIVER_VLAN=m
++BUILD_VLANCTL=dynamic
++# BUILD_LANVLAN is not set
++# BUILD_VLAN_AGGR is not set
++BUILD_ETHTOOL=y
++# BUILD_ETHTOOL_APP is not set
++
++#
++# USB and Storage Options Selection
++#
++# BRCM_DRIVER_USB is not set
++LINUX_DRIVER_USB_HOST=y
++# LINUX_DRIVER_CDCETHER is not set
++LINUX_KERNEL_USBMASS=y
++# LINUX_KERNEL_USB_DEVICEFS is not set
++# BUILD_LIBUSB is not set
++BUILD_FTPD=dynamic
++# BUILD_FTPD_STORAGE is not set
++BUILD_STORAGESERVICE=y
++BUILD_NTFS_3G=y
++# BUILD_SAMBA is not set
++
++#
++# Auxillary flash file system selection
++#
++BUILD_AUXFS_JFFS2=y
++BRCM_KERNEL_AUXFS_JFFS2=y
++
++#
++# Moca Selection
++#
++# BRCM_DRIVER_MoCA is not set
++
++#
++# WLAN Selection
++#
++BRCM_DRIVER_WIRELESS=m
++# BRCM_WAPI is not set
++BRCM_WLALTBLD="default"
++BUILD_WIFIWAN=
++# BRCM_WLMEDIA is not set
++WLBRAND_none=y
++BRCM_WLBRAND=
++BCM_WLIMPL=""
++BUILD_WLCTL=dynamic
++BUILD_WLHSPOT=y
++BUILD_NAS=dynamic
++WLSETUP_WPS=y
++# WLSETUP_none is not set
++BUILD_WPS_BTN=dynamic
++BUILD_LLTD=dynamic
++BUILD_WSC=dynamic
++BUILD_NVRAM=dynamic
++# BRCM_DRIVER_WIRELESS_USBAP is not set
++
++#
++# Voice/Phone Selection
++#
++# BRCM_DRIVER_PHONE is not set
++# BUILD_VODSL is not set
++
++#
++# WAN Protocols and VPN
++#
++BUILD_PPPD=dynamic
++PPP_AUTODISCONN=y
++BUILD_WANVLANMUX=y
++BUILD_IPSEC_TOOLS=dynamic
++BRCM_DRIVER_SPU=y
++# BRCM_DRIVER_SPU_TEST is not set
++BUILD_SPUCTL=dynamic
++# BUILD_L2TPAC is not set
++# BUILD_PPTPAC is not set
++# BUILD_GRE_TUNNEL is not set
++
++#
++# Firewall, ALGs, and Networking Features
++#
++
++#
++# Netfilter and firewall selection
++#
++BRCM_KERNEL_NETFILTER=m
++BRCM_KERNEL_NF_FIREWALL=m
++BRCM_KERNEL_NF_MANGLE=m
++BRCM_KERNEL_NF_NAT=m
++# BRCM_KERNEL_NF_DYNDSCP is not set
++# BRCM_KERNEL_NF_LAYER7_FILTER is not set
++BRCM_KERNEL_NF_NAT_ALG_FTP=m
++BRCM_KERNEL_NF_NAT_ALG_SIP=m
++BRCM_KERNEL_NF_NAT_ALG_TFTP=m
++BRCM_KERNEL_NF_NAT_ALG_H323=m
++# BRCM_KERNEL_NF_NAT_ALG_H323_SIGNAL_PROXY is not set
++BRCM_KERNEL_NF_NAT_ALG_IRC=m
++# BRCM_KERNEL_NF_NAT_ALG_WM is not set
++BRCM_KERNEL_NF_NAT_ALG_PT=m
++BRCM_KERNEL_NF_NAT_ALG_PPTP=m
++# BRCM_KERNEL_NF_NAT_ALG_IPSEC is not set
++BRCM_KERNEL_NF_NAT_ALG_RTSP=m
++# BRCM_KERNEL_NF_NAT_ALG_SNMP is not set
++# BRCM_KERNEL_NF_NAT_ALG_TALK is not set
++BRCM_KERNEL_NF_LOG=m
++# BRCM_KERNEL_NF_PPPREMOTE is not set
++# BUILD_CONNTRACK_TOOLS is not set
++BUILD_IPTABLES=dynamic
++BUILD_EBTABLES=dynamic
++# BUILD_DYNAHELPER is not set
++BUILD_TOD=dynamic
++BUILD_URLFILTER=dynamic
++BUILD_BRCTL=dynamic
++BUILD_UDHCP=dynamic
++# BUILD_UDHCP_RELAY is not set
++BUILD_SNTP=dynamic
++# DRELAY_DNSPROBE is not set
++DRELAY_DPROXY=y
++# DRELAY_DPROXYWITHPROBE is not set
++# DRELAY_NONE is not set
++BUILD_DNSPROBE=
++BUILD_DPROXY=dynamic
++BUILD_DPROXYWITHPROBE=
++BUILD_DNSSPOOF=dynamic
++BUILD_DDNSD=dynamic
++# BUILD_SUPERDMZ is not set
++BUILD_IPROUTE2=dynamic
++BUILD_ZEBRA=dynamic
++BUILD_MCAST_PROXY=dynamic
++BUILD_MCAST_SNOOP=y
++# BUILD_PCP is not set
++# BCM_JUMBO_FRAME is not set
++
++#
++# Traffic Control selection
++#
++BRCM_KERNEL_NETQOS=y
++BRCM_TC_RATE_LIMIT=y
++# BRCM_TC_POLICING is not set
++
++#
++# Packet Acceleration
++#
++BRCM_DRIVER_PKTFLOW=m
++BRCM_DRIVER_PKTFLOW_IPV6=y
++BRCM_DRIVER_PKTFLOW_MCAST=y
++BRCM_DRIVER_PKTFLOW_GRE=y
++# BRCM_DRIVER_PKTFLOW_FEATURE is not set
++# BRCM_DRIVER_PKTFLOW_DEBUG is not set
++BUILD_FCCTL=dynamic
++BRCM_DRIVER_FAP=m
++BRCM_DRIVER_FAP_GSO=y
++BRCM_DRIVER_FAP_GSO_LOOPBACK=y
++# BRCM_DRIVER_FAP_LAYER2 is not set
++BRCM_DRIVER_ARL=m
++# BRCM_DRIVER_FBOND is not set
++
++#
++# Runner Data Path API Selection
++#
++# BUILD_RDPA is not set
++
++#
++# Buffer Pool Manager and Ingress QoS
++#
++BRCM_DRIVER_BPM=m
++BRCM_BUF_MEM_PRCNT=15
++BUILD_BPMCTL=dynamic
++BRCM_DRIVER_INGQOS=m
++BUILD_IQCTL=dynamic
++
++#
++# Modular Software (JVM, OSGI, OSGIEE, LinuxEE, LinuxPFP)
++#
++# BUILD_JVM_CLASSPATH is not set
++# BUILD_JVM_JAMVM is not set
++# BUILD_OSGI_FELIX is not set
++# BUILD_MODSW_EE is not set
++# BUILD_MODSW_LINUXPFP is not set
++# BUILD_MODSW_CLI is not set
++# BUILD_MODSW_WEBUI is not set
++
++#
++# Other Features
++#
++BRCM_DRIVER_PWRMNGT=m
++BUILD_PWRCTL=dynamic
++BRCM_AVS_PWRSAVE=y
++BRCM_ETH_PWRSAVE=y
++BRCM_HOSTMIPS_PWRSAVE=y
++BRCM_DDR_SELF_REFRESH_PWRSAVE=y
++BUILD_WL_IDLE_PWRSAVE=y
++BRCM_1V2REG_AUTO_SHUTDOWN=y
++# BRCM_1V2REG_ALWAYS_SHUTDOWN is not set
++# BRCM_1V2REG_NEVER_SHUTDOWN is not set
++BUILD_TMS=y
++# BRCM_DRIVER_TRNG is not set
++# BUILD_RNGD is not set
++# BUILD_AUTODETECTION is not set
++# BUILD_LEDCTL is not set
++# BUILD_BACKUP_PSI is not set
++BUILD_PSICTL=y
++COMPRESSED_CONFIG_FILE=y
++CMS_CONFIG_COMPAT=y
++# CMS_CONFIG_IGNORE_UNRECOGNIZED is not set
++BUILD_IPPD=dynamic
++# BUILD_DLNA is not set
++BUILD_HOMEPLUG=y
++# BUILD_IEEE1905 is not set
++BUILD_CERT=dynamic
++BRCM_DEFAULTCFG=""
++
++#
++# Management Protocols and User Interface Selection
++#
++BRCM_DRIVER_SERIAL=y
++BUILD_CONSOLED=y
++# BUILD_CLI_MENU is not set
++BUILD_CLI_CMD=y
++BUILD_FAPCTL=y
++BUILD_ARLCTL=y
++BUILD_TELNETD=y
++BUILD_SSHD=y
++# BUILD_SSHD_MIPS_GENKEY is not set
++BRCM_MAX_BSD_PTP=16
++BUILD_HTTPD=y
++# BUILD_HTTPD_SSL is not set
++# BUILD_HTTPD_none is not set
++# WEB_POPUP is not set
++BUILD_QUICKSETUP=y
++
++#
++# WebUI language selection
++#
++BRCM_LANG_EN=y
++# BRCM_LANG_CN is not set
++# BRCM_LANG_TW is not set
++# BRCM_LANG_KR is not set
++BRCM_WEBUI_LANG=en_US
++# MGMT_TR69C is not set
++# MGMT_TR69C_BCM_SSL is not set
++MGMT_TR69C_SSL=y
++# MGMT_none is not set
++BUILD_TR69C=
++BUILD_TR69C_SSL=dynamic
++BUILD_TR69C_BCM_SSL=
++BRCM_CERT_FILE=
++BUILD_TR69_XBRCM=y
++BUILD_TR69_UPLOAD=y
++BUILD_TR69_QUEUED_TRANSFERS=y
++# BUILD_TR69_TR143 is not set
++# BUILD_SNMP is not set
++BUILD_TR64=y
++BUILD_TR64_LAYER3=y
++BUILD_TR64_DEVICEINFO=y
++BUILD_TR64_DEVICECONFIG=y
++BUILD_TR64_MANAGEMENTSERVER=y
++BUILD_TR64_TIME=y
++BUILD_TR64_QUEUEMANAGEMENT=y
++BUILD_TR64_LAYER2BRIDGE=y
++BUILD_TR64_LANHOSTCONFIGMGMT=y
++BUILD_TR64_LANETHINTERFACECONFIG=y
++BUILD_TR64_WLANCONFIG=y
++BUILD_TR64_LANUSBINTERFACECONFIG=y
++BUILD_TR64_LANHOSTS=y
++BUILD_TR64_WANCOMMONINTERFACE=y
++BUILD_TR64_WANDSLINTERFACE=y
++BUILD_TR64_WANDSLCONNECTIONMGMT=y
++BUILD_TR64_WANDSLDIAGNOSTICS=y
++BUILD_TR64_WANDSLLINKCONFIG=y
++BUILD_TR64_WANCABLELINKCONFIG=y
++BUILD_TR64_WANIPCONNECTION=y
++BUILD_TR64_WANPPPCONNECTION=y
++BUILD_TR64_IPPINGDIAG=y
++BUILD_TR64_WANATMF5LOOPBACKDIAG=y
++BUILD_UPNP=dynamic
++# BUILD_HASHED_PASSWORDS is not set
++
++#
++# Debug selection
++#
++# BRCM_PMON is not set
++# BRCM_BOUNCE is not set
++# BRCM_KERNEL_FTRACE is not set
++BRCM_DRIVER_LOG=y
++BRCM_KERNEL_KALLSYMS=y
++# BRCM_KERNEL_DEBUG is not set
++BUILD_EPITTCP=dynamic
++ENABLE_PRINTK_AND_BUG=y
++BCM_DEFAULT_CONSOLE_LOGLEVEL=8
++# BCM_PRINTK_TIME is not set
++BCM_COLORIZE_PRINTS=y
++# BCM_ASSERTS is not set
++# BCM_KERNEL_HACKING is not set
++BCM_BCM_SCHEDAUDIT=y
++BCM_MAGIC_SYSRQ=y
++# BRCM_KERNEL_VMTOOLS is not set
++# BRCM_KERNEL_CSTAT is not set
++# BRCM_IKOS is not set
++# BRCM_DRIVER_BCMPROF is not set
++BUILD_DEBUG_TOOLS=y
++# BUILD_GDBSERVER is not set
++# ENABLE_APP_COREDUMPS is not set
++# CMS_SECURITY_LOG is not set
++CMS_LOG_DEBUG=y
++# CMS_LOG_LEVEL_1 is not set
++CMS_LOG_LEVEL_2=y
++# CMS_STARTUP_DEBUG is not set
++# CMS_MEM_BOUNDARY_CHECK is not set
++# CMS_MEM_POISON_ALLOC_FREE is not set
++# CMS_MEM_LEAK_TRACING is not set
++# CMS_FATAL_ASSERT is not set
++# CMS_BYPASS_LOGIN is not set
++# BUILD_SOAP is not set
++# BUILD_DIAGAPP is not set
++BENCHMARKS_SMP=y
++BUILD_SYSSTAT=y
++BUILD_STRESS=y
++# BUILD_TCPDUMP is not set
++# BUILD_SENDPACKETS is not set
++# BUILD_IPERF is not set
++# BUILD_STRACE is not set
++BRCM_MEMORY_RESTRICTION_OFF=y
++# BRCM_MEMORY_RESTRICTION_16M is not set
++# BRCM_MEMORY_RESTRICTION_32M is not set
++# BRCM_MEMORY_RESTRICTION_64M is not set
++# BUILD_SPICTL is not set
+

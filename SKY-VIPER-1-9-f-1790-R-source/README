@@ -1,0 +1,10 @@
+SKY-IHR GPL source Release Notes
+
+This release contains the source code and toolchains for SKY-IHR DSL Router.
+
+To build an image, enter:
+
+# make PROFILE=VIPER_IPV6
+
+The final image will be located in  ./targets/VIPER_IPV6 subdirectory.
+

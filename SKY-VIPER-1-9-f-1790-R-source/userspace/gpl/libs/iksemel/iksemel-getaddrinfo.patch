@@ -1,0 +1,23 @@
+--- src/io-posix-old.c	2014-08-04 13:44:32.878247937 +0100
++++ src/io-posix.c	2014-08-04 13:45:29.982251827 +0100
+@@ -39,6 +39,7 @@
+ 	char port_str[6];
+ 	int err = 0;
+ 
++#if 0
+ 	hints.ai_flags = AI_CANONNAME;
+ 	hints.ai_family = PF_UNSPEC;
+ 	hints.ai_socktype = SOCK_STREAM;
+@@ -47,6 +48,12 @@
+ 	hints.ai_canonname = NULL;
+ 	hints.ai_addr = NULL;
+ 	hints.ai_next = NULL;
++#else
++        memset(&hints, 0, sizeof(hints));
++        hints.ai_family = PF_UNSPEC;
++        hints.ai_socktype = SOCK_STREAM;
++#endif /* SKY */
++
+ 	sprintf (port_str, "%i", port);
+ 
+ 	if (getaddrinfo (server, port_str, &hints, &addr_res) != 0)

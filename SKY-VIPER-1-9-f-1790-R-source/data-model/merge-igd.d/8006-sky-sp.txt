@@ -1,0 +1,10 @@
+#
+# Add the object in cms-dm-bcm-ipsec.xml below the 
+# object InternetGatewayDevice.X_SKY_RESET_PERSISTENT
+#
+# Format of command line is 
+# <cmd> <data-model-file> <target object name>
+#
+# For the addObjBelowObj command, only 1 command line per file is allowed
+
+addLastChildObjToObj cms-dm-sky-sp.xml InternetGatewayDevice.

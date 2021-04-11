@@ -1,0 +1,85 @@
+#! /bin/bash
+
+bi_this_dir=`pwd`
+bi_src_base=$bi_this_dir
+bi_crosstools_dir=/opt/toolchains/crosstools-mips-gcc-4.6-linux-3.4-uclibc-0.9.32-binutils-2.21
+build_profile
+
+
+
+clear
+echo ""
+echo "This script installs SKY-IHR DSL router components onto your Linux PC.  The"
+echo "installation will overwrite existing files.  You will be prompted before a"
+echo "component is installed."
+echo ""
+echo ""
+read -p "Press 'y' to continue: " -n 1 dr_continue
+echo ""
+if [ "$dr_continue" != "y" ] ; then
+    echo "";
+    echo "exiting script";
+    echo "";
+    exit
+fi
+
+for f in *
+do
+    case $f in
+    SKY-*-source.tar.gz)
+		build_profile=`echo  $f | cut -d "-" -f 1,2`
+        bi_src_dir=$bi_src_base/$build_profile
+        echo ""
+        echo "The SKY-IHR DSL router source files are ready to be installed at "
+        echo "$bi_src_dir. Existing source files, in any, will be overwritten. "
+        echo ""
+        read -p "Press 'y' to install the SKY-IHR DSL router source files: " -n 1 dr_continue
+        echo ""
+        echo ""
+        if [ "$dr_continue" == "y" ] ; then
+            echo ""
+            if ! [ -d $bi_src_dir ] ; then
+                echo "Creating directory $bi_src_dir."
+                echo ""
+                mkdir -p $bi_src_dir
+            fi
+            if [ -d $bi_src_dir ] ; then
+                echo "Installing files from $bi_this_dir/$f."
+                echo ""
+                cd $bi_src_dir
+                tar xfz $bi_this_dir/$f
+                chmod -R 777 * .*
+                cd $bi_this_dir
+            else
+                echo "The directory $bi_src_dir does not exist."
+                echo "The SKY DSL router source files were not installed."
+            fi
+        else
+            echo "The SKY DSL router source files were not installed."
+        fi
+        echo ""
+        ;;
+    uclibc-crosstools*.tar.gz)
+		if [ -f ${bi_crosstools_dir}/usr/bin/mips-linux-gcc ] ; then
+			echo "Correct version of toolchain has been installed in correct location,"
+			echo "no further toolchain actions are needed."
+		else
+        	echo "The uclibc toolchain is ready to be installed at $bi_crosstools_dir."
+	        read -p "Press 'y' to install the toolchain: " -n 1 dr_continue
+    	    echo ""
+        	echo ""
+	        if [ "$dr_continue" == "y" ] ; then
+    	        echo ""
+        	    echo "Installing files from $bi_this_dir/$f."
+            	echo ""
+	            tar xPfj $bi_this_dir/$f
+    	    else
+        	    echo "uclibc toolchain was not installed."
+	        fi
+    	    echo ""
+		fi
+        ;;
+    esac
+done
+
+

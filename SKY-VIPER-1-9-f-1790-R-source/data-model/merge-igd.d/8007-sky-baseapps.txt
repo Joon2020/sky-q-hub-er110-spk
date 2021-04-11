@@ -1,0 +1,11 @@
+#
+# Insert first set of objects to the (empty) AppCfgObject. 
+# 
+# Format of command line is 
+# <cmd> <data-model-file> <target object name>
+#
+# For the addFirstChildObjToObj cmd, only 1 cmd line per file is allowed
+
+addFirstChildObjToObj cms-dm-sky-baseapps.xml InternetGatewayDevice.X_BROADCOM_COM_AppCfg.
+
+
